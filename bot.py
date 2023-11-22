@@ -14,6 +14,14 @@ app = App(
 def mention_handler(say):
     say("Hello World")
 
+@app.event("message.channels")
+def repeat_message(say, event, context):
+    # 检查消息是否来自general频道
+    if event.get("channel") == "C0543EYF7FA" and 'text' in event:
+        if event.get("user") != context.bot_user_id:
+            # 重复用户的发言
+            say(text=event["text"])
+
 # 启动您的应用
 if __name__ == "__main__":
     app.start(port=int(os.environ.get("PORT", 5000)))
