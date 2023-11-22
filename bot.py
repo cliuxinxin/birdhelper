@@ -11,6 +11,10 @@ client = WebClient(token=os.environ['SLACK_BOT_TOKEN'])
 @app.route('/slack/events', methods=['POST'])
 def slack_events():
     data = request.json
+
+    # 方便调试
+    print(data)
+
     # 响应Slack的URL验证
     if 'challenge' in data:
         return jsonify({'challenge': data['challenge']})
@@ -29,7 +33,6 @@ def slack_events():
                 print(f"Error posting message: {e}")
 
     return '', 200
-
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0',debug=True)
