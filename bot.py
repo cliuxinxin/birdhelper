@@ -11,16 +11,25 @@ client = WebClient(token=os.environ['SLACK_BOT_TOKEN'])
 @app.route('/slack/events', methods=['POST'])
 def slack_events():
     data = request.json
+    # 响应Slack的URL验证
     if 'challenge' in data:
         return jsonify({'challenge': data['challenge']})
-    if data['event']['type'] == 'message' and 'subtype' not in data['event']:
-        try:
-            response = client.chat_postMessage(
-                channel=data['event']['channel'],
-                text="Hello World")
-        except SlackApiError as e:
-            print(f"Error posting message: {e}")
+
+    # 检查是否存在 'event' 键
+    if 'event' in data:
+        event = data['event']
+
+        # 处理app_mention事件
+        if event.get('type') == 'app_mention':
+            try:
+                response = client.chat_postMessage(
+                    channel=event['channel'],
+                    text="Hello, I am your bot!")
+            except SlackApiError as e:
+                print(f"Error posting message: {e}")
+
     return '', 200
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0',debug=True)
