@@ -4,14 +4,15 @@ load_dotenv()
 from flask import Flask, request, jsonify
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
-import logging
-logging.basicConfig(level=logging.INFO)
+
 
 app = Flask(__name__)
 client = WebClient(token=os.environ['SLACK_BOT_TOKEN'])
 
 @app.route('/slack/events', methods=['POST'])
 def slack_events():
+    print("Received a request")
+    print(request.get_data(as_text=True))
     data = request.json
 
     # 方便调试
