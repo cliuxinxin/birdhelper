@@ -1,29 +1,40 @@
 import os
 from dotenv import load_dotenv
 load_dotenv()
-from slack_bolt import App
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
-# 初始化您的应用
-app = App(
-    token=os.environ.get("SLACK_BOT_TOKEN"),
-    signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
-)
+# 机器人的 Token
+TOKEN = os.environ.get("TELE_BOT_TOKEN")
 
-# 定义事件处理函数
-@app.event("app_mention")
-def mention_handler(say):
-    say("Hello World")
+# 定义命令 /start 的处理函数
+def start(update, context):
+    update.message.reply_text('你好！我是回声机器人，我会重复你说的话。')
 
-@app.event("message.channels")
-def repeat_message(say, event, context):
-    # 检查消息是否来自general频道
-    if event.get("channel") == "C0543EYF7FA" and 'text' in event:
-        if event.get("user") != context.bot_user_id:
-            # 重复用户的发言
-            say(text=event["text"])
+# 定义消息处理函数
+def echo(update, context):
+    received_text = update.message.text
+    update.message.reply_text(received_text)
 
-# 启动您的应用
-if __name__ == "__main__":
-    app.start(port=int(os.environ.get("PORT", 5000)))
+# 主函数，设置机器人的处理器
+def main():
+    updater = Updater(TOKEN, use_context=True)
+
+    # 获取 dispatcher 来注册处理器
+    dp = updater.dispatcher
+
+    # 注册 /start 命令的处理器
+    dp.add_handler(CommandHandler("start", start))
+
+    # 注册消息处理器
+    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, echo))
+
+    # 开始轮询更新
+    updater.start_polling()
+
+    # 运行机器人，直到按下 Ctrl-C 或进程收到 SIGINT、SIGTERM 或 SIGABRT
+    updater.idle()
+
+if __name__ == '__main__':
+    main()
 
 

@@ -1,2 +1,2 @@
 python-dotenv
-slack_bolt
+python-telegram-bot
